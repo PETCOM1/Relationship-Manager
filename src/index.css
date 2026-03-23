@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  /* ReSync Style - Light Mode */
+  --bg-primary: #F3F4F6;
+  --bg-secondary: #FFFFFF;
+  --bg-secondary-rgb: 255, 255, 255;
+  --border-color: #E5E7EB;
+  --line-color: #D1D5DB;
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --accent-primary: #10B981;
+  --accent-secondary: #DCFCE7;
+  
+  --sidebar-w: 240px;
+}
+
+.dark {
+  /* ReSync Style - Dark Mode */
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-secondary-rgb: 30, 41, 59;
+  --border-color: #334155;
+  --line-color: #475569;
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --accent-primary: #34D399;
+  --accent-secondary: #064E3B;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-float {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
