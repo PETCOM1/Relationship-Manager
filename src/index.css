@@ -12,6 +12,10 @@
   --accent-primary: #10B981;
   --accent-secondary: #DCFCE7;
   
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  
   --sidebar-w: 240px;
 }
 
@@ -26,6 +30,10 @@
   --text-secondary: #9CA3AF;
   --accent-primary: #34D399;
   --accent-secondary: #064E3B;
+  
+  --glass-bg: rgba(15, 23, 42, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 body {

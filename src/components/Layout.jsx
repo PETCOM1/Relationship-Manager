@@ -2,15 +2,15 @@ import React, { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  Plus, Search, LayoutDashboard, Users, 
-  ChevronLeft, Moon, Sun, Github
+  UserPlus, Search, Home, Layers, 
+  Network, Moon, Sun, Sparkles
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import AddConnectionModal from './AddConnectionModal'
 
 export default function Layout({ children }) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
   const [isSearchFocused, setIsSearchFocused] = React.useState(false)
   const { groups, people, searchQuery, setSearchQuery, isDarkMode, toggleDarkMode } = useStore()
   const location = useLocation()
@@ -28,11 +28,18 @@ export default function Layout({ children }) {
       {/* Sidebar - Floating Card Style */}
       <motion.aside 
         initial={false}
-        animate={{ width: isSidebarOpen ? 'var(--sidebar-w)' : '80px' }}
-        className="fixed left-4 top-4 bottom-4 border transition-all duration-300 z-50 flex flex-col rounded-[2.5rem] sidebar-float overflow-hidden"
+        animate={{ 
+          width: isSidebarOpen ? 'var(--sidebar-w)' : '80px',
+          backgroundColor: isSidebarOpen ? 'var(--glass-bg)' : 'rgba(var(--bg-secondary-rgb), 0.4)'
+        }}
+        onMouseEnter={() => setIsSidebarOpen(true)}
+        onMouseLeave={() => setIsSidebarOpen(false)}
+        className="fixed left-4 top-4 bottom-4 transition-all duration-300 z-50 flex flex-col rounded-[2.5rem] overflow-hidden group/sidebar"
         style={{ 
-          backgroundColor: 'var(--bg-secondary)', 
-          borderColor: 'var(--border-color)' 
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid var(--glass-border)',
+          boxShadow: 'var(--glass-shadow)'
         }}
       >
         <div className="p-6 flex items-center justify-between">
@@ -40,55 +47,61 @@ export default function Layout({ children }) {
              <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden" style={{ backgroundColor: 'var(--accent-primary)' }}>
                 <div className="absolute inset-0 bg-white/20 -rotate-45 translate-x-1" />
                 <div className="absolute inset-0 bg-white/20 rotate-45 -translate-x-1" />
-                <Users className="text-white w-4 h-4 relative z-10" />
+                <Sparkles className="text-white w-4 h-4 relative z-10" />
               </div>
               {isSidebarOpen && (
-                <span className="font-black text-xl tracking-tighter" style={{ color: 'var(--text-primary)' }}>ReSync</span>
+                <motion.span 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="font-black text-xl tracking-tighter" 
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  ReSync
+                </motion.span>
               )}
           </div>
-          {isSidebarOpen && (
-            <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
-              <ChevronLeft size={18} />
-            </button>
-          )}
         </div>
 
         <div className="px-4 mb-6">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="w-full h-12 rounded-2xl border-2 flex items-center justify-center space-x-2 transition-all hover:scale-[1.02] hover:shadow-md"
-            style={{ borderColor: 'var(--border-color)', color: 'var(--accent-primary)' }}
+            className="w-full h-12 rounded-2xl flex items-center justify-center space-x-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md relative overflow-hidden group"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--accent-primary) 0%, #10B981 100%)',
+              color: 'white'
+            }}
           >
-            <Plus size={20} />
-            {isSidebarOpen && <span className="font-bold text-sm">Add New</span>}
+            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <UserPlus size={20} className="relative z-10" />
+            {isSidebarOpen && <span className="font-bold text-sm relative z-10">Add New</span>}
           </button>
         </div>
 
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto overflow-x-hidden pt-2 scrollbar-none">
           <NavItem 
             to="/" 
-            icon={<LayoutDashboard size={20} />} 
+            icon={<Home size={20} />} 
             label="Home" 
             active={location.pathname === '/'}
             isSidebarOpen={isSidebarOpen}
           />
           <NavItem 
             to="/family-tree" 
-            icon={<Github size={20} />} 
+            icon={<Network size={20} />} 
             label="Kinship Map" 
             active={location.pathname === '/family-tree'}
             isSidebarOpen={isSidebarOpen}
           />
           
-          <div className={`pt-6 pb-2 px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-40' : 'opacity-0'}`}>
-            <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Clusters</span>
+          <div className={`pt-8 pb-3 px-4 transition-all duration-300 ${isSidebarOpen ? 'opacity-60' : 'opacity-0'}`}>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--text-secondary)' }}>Clusters</span>
           </div>
           
           {groups.map(group => (
             <NavItem 
               key={group.id}
               to={`/group/${group.id}`} 
-              icon={<Users size={20} />} 
+              icon={<Layers size={20} />} 
               label={group.name} 
               active={location.pathname === `/group/${group.id}`}
               isSidebarOpen={isSidebarOpen}
@@ -98,27 +111,27 @@ export default function Layout({ children }) {
 
 
 
-        <div className="p-4 flex items-center justify-between border-t transition-colors" style={{ borderColor: 'var(--border-color)' }}>
+        <div className="p-4 flex items-center justify-center border-t transition-colors" style={{ borderColor: 'var(--border-color)' }}>
           <button 
             onClick={toggleDarkMode}
-            className="p-3 rounded-2xl transition-all hover:scale-110 shadow-sm"
-            style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--accent-primary)' }}
+            className="p-3 rounded-2xl transition-all hover:scale-110 active:scale-95 shadow-lg relative group overflow-hidden"
+            style={{ 
+              backgroundColor: 'var(--accent-primary)', 
+              color: 'white' 
+            }}
           >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative z-10 transition-transform duration-500 group-hover:rotate-12">
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </div>
           </button>
-          
-          {!isSidebarOpen && (
-            <button onClick={() => setIsSidebarOpen(true)} className="p-3 rounded-2xl transition-all hover:scale-110" style={{ color: 'var(--text-secondary)' }}>
-              <ChevronLeft className="rotate-180" size={20} />
-            </button>
-          )}
         </div>
       </motion.aside>
 
       {/* Main Content */}
       <main 
         className="flex-1 transition-all duration-300 relative flex flex-col" 
-        style={{ marginLeft: isSidebarOpen ? 'var(--sidebar-w)' : '80px' }}
+        style={{ marginLeft: '80px' }}
       >
         <header 
           className={`h-16 flex items-center justify-between px-4 z-40 transition-all duration-500`}
@@ -218,22 +231,26 @@ function NavItem({ to, icon, label, active, isSidebarOpen }) {
   return (
     <Link to={to} className="block group">
       <div 
-        className={`flex items-center space-x-4 p-4 rounded-[1.25rem] transition-all duration-300 relative ${active ? 'shadow-lg' : 'hover:bg-slate-500/5'}`}
+        className={`flex items-center space-x-4 p-4 rounded-[1.25rem] transition-all duration-300 relative ${active ? 'shadow-lg shadow-emerald-500/20' : 'hover:bg-white/5 dark:hover:bg-white/5'}`}
         style={{ 
-          backgroundColor: active ? 'var(--accent-primary)' : 'transparent',
-          color: active ? 'white' : 'var(--text-secondary)'
+          background: active ? 'linear-gradient(135deg, var(--accent-primary) 0%, #059669 100%)' : 'transparent',
+          color: active ? 'white' : 'var(--text-secondary)',
+          border: active ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent'
         }}
       >
-        <div className={`transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>
+        <div className={`transition-transform duration-300 ${active ? 'scale-110 drop-shadow-md' : 'group-hover:scale-110'}`}>
           {icon}
         </div>
         {isSidebarOpen && (
-          <span className={`font-bold text-sm tracking-tight`}>
+          <span className={`font-bold text-sm tracking-tight ${active ? 'text-white' : ''}`}>
             {label}
           </span>
         )}
         {active && isSidebarOpen && (
-           <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/50" />
+           <motion.div 
+             layoutId="active-indicator"
+             className="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]" 
+           />
         )}
       </div>
     </Link>
