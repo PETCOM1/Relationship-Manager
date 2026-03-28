@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
@@ -11,7 +11,8 @@ import { useStore } from '../store/useStore'
 export default function PersonProfile() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { people, relationships, groups } = useStore()
+  const { people, relationships, groups, addNote, deleteNote } = useStore()
+  const [noteText, setNoteText] = useState('')
 
   const person = useMemo(() => people.find(p => p.id === id), [people, id])
   
@@ -47,9 +48,9 @@ export default function PersonProfile() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-20">
+    <div className="max-w-[1400px] pb-20">
       {/* Navigation & Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4">
         <button 
           onClick={() => navigate(-1)}
           className="group flex items-center gap-3 px-4 py-2 rounded-2xl border bg-white/50 backdrop-blur-sm transition-all hover:scale-105"
@@ -70,15 +71,15 @@ export default function PersonProfile() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative mb-12">
-        <div className="h-64 rounded-[3rem] overflow-hidden relative shadow-2xl border" style={{ borderColor: 'var(--border-color)' }}>
+      <section className="relative mb-8">
+        <div className="h-40 rounded-[2.5rem] overflow-hidden relative shadow-lg border" style={{ borderColor: 'var(--border-color)' }}>
            {/* Abstract Background */}
            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-900" />
            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.pattern')]" />
            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/10 to-transparent pointer-events-none" />
         </div>
 
-        <div className="px-12 -mt-20 relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="px-12 -mt-16 relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="flex flex-col md:flex-row md:items-end gap-6">
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
@@ -87,7 +88,7 @@ export default function PersonProfile() {
             >
               <img 
                 src={person.photo} 
-                className="w-40 h-40 rounded-[2.5rem] object-cover border-[6px] shadow-2xl" 
+                className="w-32 h-32 rounded-[2.5rem] object-cover border-[4px] shadow-2xl" 
                 style={{ borderColor: 'var(--bg-primary)' }}
                 alt={person.name} 
               />
@@ -112,15 +113,6 @@ export default function PersonProfile() {
             </div>
           </div>
 
-          <div className="flex gap-2 pb-2">
-            <button className="h-11 px-6 rounded-2xl bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest shadow-lg hover:scale-105 transition-transform">
-              Connect
-            </button>
-            <button className="h-11 px-5 rounded-2xl border bg-white/50 backdrop-blur-sm font-black text-[10px] uppercase tracking-widest transition-all hover:scale-105"
-              style={{ borderColor: 'var(--border-color)' }}>
-              Message
-            </button>
-          </div>
         </div>
       </section>
 
@@ -135,8 +127,8 @@ export default function PersonProfile() {
               {[
                 { label: 'Location', value: 'Johannesburg, SA', Icon: MapPin },
                 { label: 'Network', value: group?.name || 'General', Icon: Users },
-                { label: 'Since', value: 'April 2024', Icon: Clock },
-                { label: 'Status', value: person.role, Icon: GitBranch }
+                { label: 'Date of Birth', value: '12 October 1995', Icon: Calendar },
+                { label: 'Relationship', value: person.role, Icon: Heart }
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-4">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border" 
@@ -152,17 +144,6 @@ export default function PersonProfile() {
             </div>
           </div>
 
-          {/* Social Proof Stats */}
-          <div className="grid grid-cols-2 gap-4">
-             <div className="p-5 rounded-[2rem] border bg-white shadow-sm flex flex-col items-center text-center gap-1" style={{ borderColor: 'var(--border-color)' }}>
-                <span className="text-2xl font-black" style={{ color: 'var(--text-primary)' }}>1.2K</span>
-                <span className="text-[9px] font-black uppercase opacity-40" style={{ color: 'var(--text-secondary)' }}>Interactions</span>
-             </div>
-             <div className="p-5 rounded-[2rem] border bg-white shadow-sm flex flex-col items-center text-center gap-1" style={{ borderColor: 'var(--border-color)' }}>
-                <span className="text-2xl font-black" style={{ color: 'var(--accent-primary)' }}>{connections.length}</span>
-                <span className="text-[9px] font-black uppercase opacity-40" style={{ color: 'var(--text-secondary)' }}>Links</span>
-             </div>
-          </div>
         </div>
 
         {/* Blog / Story Feed */}
@@ -191,69 +172,134 @@ export default function PersonProfile() {
             </div>
           </div>
 
-          {/* Mini Activity Feed */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-black uppercase tracking-widest opacity-60 ml-4" style={{ color: 'var(--text-secondary)' }}>Recent Memories</h3>
-            
-            {[
-              { type: 'comment', text: 'shared a new insight in the group discussion', time: '2 hours ago', icon: MessageSquare },
-              { type: 'connection', text: `joined the ${group?.name} cluster via Petrus`, time: '1 day ago', icon: Users },
-              { type: 'award', text: 'recognized for outstanding contribution to the network', time: '3 days ago', icon: Award }
-            ].map((post, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 * i }}
-                className="flex items-start gap-4 p-5 rounded-3xl border bg-white hover:shadow-md transition-all group"
-                style={{ borderColor: 'var(--border-color)' }}
+          {/* Lattice and Diary removed from here */}
+        </div>
+      </div>
+
+      {/* Full-Width Personal Diary System (Matches Hero Banner Width) */}
+      <div className="mt-16 pb-12">
+        <div className="space-y-8">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-black uppercase tracking-widest opacity-60" style={{ color: 'var(--text-secondary)' }}>Personal Diary</h3>
+            <span className="text-[10px] font-bold opacity-40">{(person.notes || []).length} Entries</span>
+          </div>
+          
+          {/* Quick Entry Area */}
+          <div className="p-8 rounded-[3rem] border bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: 'var(--border-color)' }}>
+            <textarea 
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder="Record whatever you know about this person..."
+              className="w-full h-32 bg-transparent border-none focus:ring-0 text-base placeholder:opacity-40 shadow-none resize-none px-2 leading-relaxed"
+              style={{ color: 'var(--text-primary)' }}
+            />
+            <div className="flex justify-end pt-4">
+              <button 
+                onClick={() => {
+                  if (noteText.trim()) {
+                    addNote(person.id, noteText.trim())
+                    setNoteText('')
+                  }
+                }}
+                disabled={!noteText.trim()}
+                className="px-10 py-4 rounded-3xl bg-emerald-500 text-white font-black text-[11px] uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:hover:scale-100 disabled:shadow-none"
               >
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border transition-transform group-hover:rotate-6"
-                  style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--accent-primary)' }}>
-                  <post.icon size={18} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-black truncate" style={{ color: 'var(--text-primary)' }}>{person.name}</span>
-                    <span className="text-[10px] opacity-50 font-medium" style={{ color: 'var(--text-secondary)' }}>· {post.time}</span>
-                  </div>
-                  <p className="text-[11px] leading-snug" style={{ color: 'var(--text-secondary)' }}>
-                    {post.text}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                Save Diary Entry
+              </button>
+            </div>
           </div>
 
-          {/* Connections Grid */}
-          <div className="space-y-4 pt-4">
-             <div className="flex items-center justify-between mx-4">
-               <h3 className="text-sm font-black uppercase tracking-widest opacity-60" style={{ color: 'var(--text-secondary)' }}>Relationship Lattice</h3>
-               <Link to="/family-tree" className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--accent-primary)' }}>Visualize All</Link>
-             </div>
-             
-             <div className="grid grid-cols-3 gap-3">
-               {connections.slice(0, 3).map((conn, i) => (
-                 <Link to={`/person/${conn.person.id}`} key={i}>
-                   <motion.div 
-                     whileHover={{ scale: 1.05, y: -2 }}
-                     className="p-3 rounded-2xl border bg-white text-center flex flex-col items-center gap-2"
-                     style={{ borderColor: 'var(--border-color)' }}
-                   >
-                     <img src={conn.person.photo} className="w-10 h-10 rounded-xl object-cover" alt="" />
-                     <div className="min-w-0">
-                       <p className="text-[9px] font-black truncate" style={{ color: 'var(--text-primary)' }}>{conn.person.name}</p>
-                       <p className="text-[8px] font-bold opacity-50 uppercase tracking-tighter" style={{ color: 'var(--accent-primary)' }}>{conn.type}</p>
-                     </div>
-                   </motion.div>
-                 </Link>
-               ))}
-               {connections.length === 0 && (
-                 <div className="col-span-3 py-6 text-center text-[10px] font-bold opacity-30 italic">No public connections available.</div>
-               )}
-             </div>
+          {/* Diary Entries List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(person.notes || []).length > 0 ? (
+              <>
+                {person.notes.slice(0, 3).map((note) => (
+                  <motion.div 
+                    key={note.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col gap-5 p-8 rounded-[3rem] border bg-white shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+                    style={{ borderColor: 'var(--border-color)' }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="p-3 rounded-2xl border bg-slate-50" style={{ borderColor: 'var(--border-color)', color: 'var(--accent-primary)' }}>
+                          <Clock size={16} />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40" style={{ color: 'var(--text-secondary)' }}>
+                          {new Date(note.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} - {new Date(note.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <button 
+                        onClick={() => deleteNote(person.id, note.id)}
+                        className="p-3 rounded-2xl opacity-0 group-hover:opacity-100 hover:bg-rose-50 hover:text-rose-500 transition-all shadow-sm"
+                      >
+                        <Share2 size={16} className="rotate-45" />
+                      </button>
+                    </div>
+                    
+                    <div className="relative max-h-[160px] group-hover:max-h-[600px] overflow-hidden group-hover:overflow-y-auto transition-all duration-700 ease-in-out pr-2 custom-scrollbar">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap italic line-clamp-6 group-hover:line-clamp-none transition-all duration-700" style={{ color: 'var(--text-secondary)' }}>
+                        "{note.content}"
+                      </p>
+                      {/* Gradient Fade for Truncation */}
+                      <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent group-hover:opacity-0 pointer-events-none transition-opacity duration-500" />
+                    </div>
+                  </motion.div>
+                ))}
+              </>
+            ) : (
+              <div className="col-span-full py-24 text-center rounded-[3rem] border border-dashed flex flex-col items-center gap-4" style={{ borderColor: 'var(--border-color)' }}>
+                 <div className="w-16 h-16 rounded-3xl border border-dashed flex items-center justify-center opacity-20">
+                    <BookOpen size={32} />
+                 </div>
+                 <p className="text-xs font-bold opacity-30 italic max-w-xs mx-auto">This personal diary is empty. Start recording your journey with {person.name} above.</p>
+              </div>
+            )}
           </div>
+
+          {(person.notes || []).length > 3 && (
+            <div className="flex justify-center pt-6">
+              <Link 
+                to={`/person/${person.id}/diary`}
+                className="group px-12 py-5 rounded-[2.5rem] border border-dashed text-[11px] font-black uppercase tracking-[0.3em] hover:bg-white transition-colors flex items-center gap-4"
+                style={{ color: 'var(--accent-primary)', borderColor: 'var(--border-color)' }}
+              >
+                Browse Full History <ArrowLeft size={16} className="rotate-180 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* Relationship Lattice (Now at the very bottom) */}
+      <div className="space-y-6 pt-12 pb-24 border-t" style={{ borderColor: 'var(--border-color)' }}>
+         <div className="flex items-center justify-between">
+           <h3 className="text-sm font-black uppercase tracking-widest opacity-60" style={{ color: 'var(--text-secondary)' }}>Relationship Lattice</h3>
+           <Link to="/family-tree" className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--accent-primary)' }}>Visualize Full Network</Link>
+         </div>
+         
+         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+           {connections.map((conn, i) => (
+             <Link to={`/person/${conn.person.id}`} key={i}>
+               <motion.div 
+                 whileHover={{ scale: 1.05, y: -4 }}
+                 className="p-5 rounded-[2rem] border bg-white shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 relative overflow-hidden group"
+                 style={{ borderColor: 'var(--border-color)' }}
+               >
+                 <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                 <img src={conn.person.photo} className="w-12 h-12 rounded-2xl object-cover shadow-sm" alt="" />
+                 <div className="text-center min-w-0 w-full">
+                   <p className="text-[10px] font-black truncate" style={{ color: 'var(--text-primary)' }}>{conn.person.name}</p>
+                   <p className="text-[8px] font-black uppercase tracking-widest opacity-40 mt-0.5" style={{ color: 'var(--text-secondary)' }}>{conn.type}</p>
+                 </div>
+               </motion.div>
+             </Link>
+           ))}
+           {connections.length === 0 && (
+             <div className="col-span-full py-12 text-center text-xs font-bold opacity-20 italic bg-white/50 rounded-[2rem] border border-dashed" style={{ borderColor: 'var(--border-color)' }}>No publicly mapped connections available.</div>
+           )}
+         </div>
       </div>
     </div>
   )

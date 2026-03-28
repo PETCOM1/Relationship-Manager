@@ -121,6 +121,20 @@ export const useStore = create(
         people: state.people.filter(p => p.id !== id),
         relationships: state.relationships.filter(r => r.fromId !== id && r.toId !== id)
       })),
+      addNote: (personId, content) => set((state) => ({
+        people: state.people.map(p => 
+          p.id === personId 
+            ? { ...p, notes: [{ id: Date.now(), content, date: new Date().toISOString() }, ...(p.notes || [])] } 
+            : p
+        )
+      })),
+      deleteNote: (personId, noteId) => set((state) => ({
+        people: state.people.map(p => 
+          p.id === personId 
+            ? { ...p, notes: (p.notes || []).filter(n => n.id !== noteId) } 
+            : p
+        )
+      })),
     }),
     {
       name: 'relationship-manager-storage',

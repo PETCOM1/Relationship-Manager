@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import GroupView from './pages/GroupView'
 import FamilyTree from './pages/FamilyTree'
 import PersonProfile from './pages/PersonProfile'
+import FullDiary from './pages/FullDiary'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/group/:groupId" element={<GroupView />} />
         <Route path="/family-tree" element={<FamilyTree />} />
         <Route path="/person/:id" element={<PersonProfile />} />
+        <Route path="/person/:id/diary" element={<FullDiary />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Layout>

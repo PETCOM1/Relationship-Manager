@@ -2,8 +2,9 @@ import React, { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  UserPlus, Search, Home, Layers, 
-  Network, Moon, Sun, Sparkles
+  UserPlus, Home, Layers, 
+  Network, Moon, Sun,
+  Users, Heart, Briefcase, GraduationCap
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import AddConnectionModal from './AddConnectionModal'
@@ -11,8 +12,7 @@ import AddConnectionModal from './AddConnectionModal'
 export default function Layout({ children }) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
-  const [isSearchFocused, setIsSearchFocused] = React.useState(false)
-  const { groups, people, searchQuery, setSearchQuery, isDarkMode, toggleDarkMode } = useStore()
+  const { groups, isDarkMode, toggleDarkMode } = useStore()
   const location = useLocation()
 
   useEffect(() => {
@@ -34,7 +34,8 @@ export default function Layout({ children }) {
         }}
         onMouseEnter={() => setIsSidebarOpen(true)}
         onMouseLeave={() => setIsSidebarOpen(false)}
-        className="fixed left-4 top-4 bottom-4 transition-all duration-300 z-50 flex flex-col rounded-[2.5rem] overflow-hidden group/sidebar"
+        className="fixed left-4 top-4 bottom-4 z-50 flex flex-col rounded-[2.5rem] overflow-hidden group/sidebar"
+        transition={{ type: 'spring', stiffness: 400, damping: 40 }}
         style={{ 
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
@@ -44,21 +45,24 @@ export default function Layout({ children }) {
       >
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-             <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden" style={{ backgroundColor: 'var(--accent-primary)' }}>
-                <div className="absolute inset-0 bg-white/20 -rotate-45 translate-x-1" />
-                <div className="absolute inset-0 bg-white/20 rotate-45 -translate-x-1" />
-                <Sparkles className="text-white w-4 h-4 relative z-10" />
+             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden shadow-lg border border-white/10" 
+                  style={{ background: 'linear-gradient(135deg, var(--accent-primary) 0%, #059669 100%)' }}>
+                <div className="absolute inset-0 bg-white/20 -rotate-45 translate-y-1" />
+                <span className="text-white font-black text-xl relative z-10 italic tracking-tighter">R</span>
               </div>
-              {isSidebarOpen && (
-                <motion.span 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="font-black text-xl tracking-tighter" 
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  ReSync
-                </motion.span>
-              )}
+              <AnimatePresence>
+                {isSidebarOpen && (
+                  <motion.span 
+                    initial={{ opacity: 0, x: -10, width: 0 }}
+                    animate={{ opacity: 1, x: 0, width: 'auto' }}
+                    exit={{ opacity: 0, x: -10, width: 0 }}
+                    className="font-black text-xl tracking-tighter overflow-hidden whitespace-nowrap" 
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    ReSync
+                  </motion.span>
+                )}
+              </AnimatePresence>
           </div>
         </div>
 
@@ -73,7 +77,18 @@ export default function Layout({ children }) {
           >
             <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <UserPlus size={20} className="relative z-10" />
-            {isSidebarOpen && <span className="font-bold text-sm relative z-10">Add New</span>}
+            <AnimatePresence>
+              {isSidebarOpen && (
+                <motion.span 
+                  initial={{ opacity: 0, x: -10, width: 0 }}
+                  animate={{ opacity: 1, x: 0, width: 'auto' }}
+                  exit={{ opacity: 0, x: -10, width: 0 }}
+                  className="font-bold text-sm relative z-10 overflow-hidden whitespace-nowrap"
+                >
+                  Add New
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
         </div>
 
@@ -93,107 +108,81 @@ export default function Layout({ children }) {
             isSidebarOpen={isSidebarOpen}
           />
           
-          <div className={`pt-8 pb-3 px-4 transition-all duration-300 ${isSidebarOpen ? 'opacity-60' : 'opacity-0'}`}>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--text-secondary)' }}>Clusters</span>
-          </div>
+          <AnimatePresence>
+            {isSidebarOpen && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 0.6, y: 0, height: 'auto' }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                className="pt-8 pb-3 px-4 overflow-hidden"
+              >
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>Clusters</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
-          {groups.map(group => (
-            <NavItem 
-              key={group.id}
-              to={`/group/${group.id}`} 
-              icon={<Layers size={20} />} 
-              label={group.name} 
-              active={location.pathname === `/group/${group.id}`}
-              isSidebarOpen={isSidebarOpen}
-            />
-          ))}
+          {groups.map(group => {
+            const IconComponent = {
+              Users,
+              Heart,
+              Briefcase,
+              GraduationCap
+            }[group.icon] || Layers
+
+            return (
+              <NavItem 
+                key={group.id}
+                to={`/group/${group.id}`} 
+                icon={<IconComponent size={20} />} 
+                label={group.name} 
+                active={location.pathname === `/group/${group.id}`}
+                isSidebarOpen={isSidebarOpen}
+              />
+            )
+          })}
         </nav>
 
 
 
         <div className="p-4 flex items-center justify-center border-t transition-colors" style={{ borderColor: 'var(--border-color)' }}>
-          <button 
+          <div 
             onClick={toggleDarkMode}
-            className="p-3 rounded-2xl transition-all hover:scale-110 active:scale-95 shadow-lg relative group overflow-hidden"
-            style={{ 
-              backgroundColor: 'var(--accent-primary)', 
-              color: 'white' 
-            }}
+            className={`relative w-14 h-8 rounded-full cursor-pointer transition-all duration-300 p-1 flex items-center ${isDarkMode ? 'bg-emerald-500/20' : 'bg-slate-200'}`}
+            style={{ border: '1px solid var(--border-color)' }}
           >
-            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative z-10 transition-transform duration-500 group-hover:rotate-12">
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </div>
-          </button>
+            <motion.div 
+              className="w-6 h-6 rounded-full shadow-lg flex items-center justify-center"
+              initial={false}
+              animate={{ 
+                x: isDarkMode ? 24 : 0,
+                backgroundColor: isDarkMode ? 'var(--accent-primary)' : '#fff'
+              }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            >
+              {isDarkMode ? (
+                <Moon size={14} className="text-white" />
+              ) : (
+                <Sun size={14} className="text-amber-500" />
+              )}
+            </motion.div>
+          </div>
         </div>
       </motion.aside>
 
       {/* Main Content */}
-      <main 
-        className="flex-1 transition-all duration-300 relative flex flex-col" 
-        style={{ marginLeft: '80px' }}
+      <motion.main 
+        className="flex-1 relative flex flex-col" 
+        animate={{ marginLeft: isSidebarOpen ? 'var(--sidebar-w)' : '80px' }}
+        transition={{ type: 'spring', stiffness: 400, damping: 40 }}
       >
         <header 
-          className={`h-16 flex items-center justify-between px-4 z-40 transition-all duration-500`}
+          className="sticky top-0 h-16 flex items-center justify-between px-6 z-40 transition-all duration-500 backdrop-blur-lg border-b"
+          style={{ 
+            backgroundColor: 'rgba(var(--bg-primary-rgb), 0.65)',
+            borderColor: 'var(--border-color)' 
+          }}
         >
-          <div className="relative w-80 max-w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-secondary)', opacity: 0.5 }} />
-            <input 
-              type="text" 
-              placeholder="Search anything..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              className="w-full h-12 rounded-2xl pl-12 pr-4 text-xs transition-all focus:ring-2 outline-none border transition-colors shadow-sm"
-              style={{ 
-                backgroundColor: 'var(--bg-secondary)', 
-                borderColor: 'var(--border-color)',
-                color: 'var(--text-primary)',
-                '--tw-ring-color': 'var(--accent-primary)'
-              }}
-            />
-
-            {/* Global Search Results Dropdown */}
-            <AnimatePresence>
-              {isSearchFocused && searchQuery.length > 0 && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsSearchFocused(false)} />
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-14 left-0 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden"
-                  >
-                    <div className="max-h-80 overflow-y-auto p-2 space-y-1">
-                      {people.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6).map(p => (
-                        <Link 
-                          key={p.id} 
-                          to={`/person/${p.id}`}
-                          onClick={() => {
-                            setSearchQuery('')
-                            setIsSearchFocused(false)
-                          }}
-                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                        >
-                          <img src={p.photo} className="w-8 h-8 rounded-lg object-cover grayscale group-hover:grayscale-0 transition-all shadow-sm" alt="" />
-                          <div className="min-w-0">
-                            <p className="text-[11px] font-black truncate" style={{ color: 'var(--text-primary)' }}>{p.name}</p>
-                            <p className="text-[9px] font-bold opacity-50 uppercase tracking-widest" style={{ color: 'var(--accent-primary)' }}>{p.role}</p>
-                          </div>
-                        </Link>
-                      ))}
-                      {people.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
-                        <div className="p-8 text-center">
-                          <p className="text-[10px] font-black opacity-30 uppercase tracking-widest">No results found</p>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-
-          </div>
+          <div />
 
           <Link to="/person/6" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
              <div className="hidden md:flex flex-col items-end">
@@ -220,7 +209,7 @@ export default function Layout({ children }) {
             </motion.div>
           </AnimatePresence>
         </div>
-      </main>
+      </motion.main>
 
       <AddConnectionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
@@ -241,11 +230,18 @@ function NavItem({ to, icon, label, active, isSidebarOpen }) {
         <div className={`transition-transform duration-300 ${active ? 'scale-110 drop-shadow-md' : 'group-hover:scale-110'}`}>
           {icon}
         </div>
-        {isSidebarOpen && (
-          <span className={`font-bold text-sm tracking-tight ${active ? 'text-white' : ''}`}>
-            {label}
-          </span>
-        )}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.span 
+              initial={{ opacity: 0, x: -10, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: 'auto' }}
+              exit={{ opacity: 0, x: -10, width: 0 }}
+              className={`font-bold text-sm tracking-tight overflow-hidden whitespace-nowrap ${active ? 'text-white' : ''}`}
+            >
+              {label}
+            </motion.span>
+          )}
+        </AnimatePresence>
         {active && isSidebarOpen && (
            <motion.div 
              layoutId="active-indicator"

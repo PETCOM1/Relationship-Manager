@@ -3,6 +3,7 @@
 :root {
   /* ReSync Style - Light Mode */
   --bg-primary: #F3F4F6;
+  --bg-primary-rgb: 243, 244, 246;
   --bg-secondary: #FFFFFF;
   --bg-secondary-rgb: 255, 255, 255;
   --border-color: #E5E7EB;
@@ -22,6 +23,7 @@
 .dark {
   /* ReSync Style - Dark Mode */
   --bg-primary: #0F172A;
+  --bg-primary-rgb: 15, 23, 42;
   --bg-secondary: #1E293B;
   --bg-secondary-rgb: 30, 41, 59;
   --border-color: #334155;
@@ -45,4 +47,21 @@ body {
 
 .sidebar-float {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
 }
