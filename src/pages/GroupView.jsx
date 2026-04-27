@@ -51,7 +51,7 @@ function Pagination({ page, total, perPage, onChange }) {
 
 export default function GroupView() {
   const { groupId } = useParams()
-  const { people, groups, searchQuery } = useStore()
+  const { people, groups, searchQuery, openModal } = useStore()
   const [page, setPage] = useState(1)
   
   const group = groups.find(g => g.id === groupId)
@@ -86,6 +86,11 @@ export default function GroupView() {
             <h1 className="text-3xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>
               {group.name}
             </h1>
+            {group.description && (
+              <p className="text-xs mt-1 max-w-lg opacity-60" style={{ color: 'var(--text-secondary)' }}>
+                {group.description}
+              </p>
+            )}
           </div>
         </div>
 
@@ -98,6 +103,7 @@ export default function GroupView() {
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => openModal('addConnection', { groupId })}
             className="h-11 px-5 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-lg transition-all" 
             style={{ backgroundColor: 'var(--accent-primary)', color: '#fff' }}
           >

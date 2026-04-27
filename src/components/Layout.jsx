@@ -8,11 +8,11 @@ import {
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import AddConnectionModal from './AddConnectionModal'
+import AddClusterModal from './AddClusterModal'
 
 export default function Layout({ children }) {
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
-  const { groups, isDarkMode, toggleDarkMode } = useStore()
+  const { groups, isDarkMode, toggleDarkMode, openModal } = useStore()
   const location = useLocation()
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function Layout({ children }) {
 
         <div className="px-4 mb-6">
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => openModal('addCluster')}
             className="w-full h-12 rounded-2xl flex items-center justify-center space-x-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md relative overflow-hidden group"
             style={{ 
               background: 'linear-gradient(135deg, var(--accent-primary) 0%, #10B981 100%)',
@@ -76,7 +76,7 @@ export default function Layout({ children }) {
             }}
           >
             <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <UserPlus size={20} className="relative z-10" />
+            <Layers size={20} className="relative z-10" />
             <AnimatePresence>
               {isSidebarOpen && (
                 <motion.span 
@@ -85,7 +85,7 @@ export default function Layout({ children }) {
                   exit={{ opacity: 0, x: -10, width: 0 }}
                   className="font-bold text-sm relative z-10 overflow-hidden whitespace-nowrap"
                 >
-                  Add New
+                  New Cluster
                 </motion.span>
               )}
             </AnimatePresence>
@@ -144,27 +144,50 @@ export default function Layout({ children }) {
 
 
 
-        <div className="p-4 flex items-center justify-center border-t transition-colors" style={{ borderColor: 'var(--border-color)' }}>
+        <div className="p-4 border-t transition-colors" style={{ borderColor: 'var(--border-color)' }}>
           <div 
             onClick={toggleDarkMode}
-            className={`relative w-14 h-8 rounded-full cursor-pointer transition-all duration-300 p-1 flex items-center ${isDarkMode ? 'bg-emerald-500/20' : 'bg-slate-200'}`}
-            style={{ border: '1px solid var(--border-color)' }}
+            className={`flex items-center rounded-[1.25rem] cursor-pointer transition-all duration-300 relative group/toggle ${isDarkMode ? 'bg-emerald-500/10' : 'bg-slate-100 dark:bg-white/5'}`}
+            style={{ 
+              padding: isSidebarOpen ? '12px 16px' : '12px',
+              border: '1px solid var(--border-color)'
+            }}
           >
-            <motion.div 
-              className="w-6 h-6 rounded-full shadow-lg flex items-center justify-center"
-              initial={false}
-              animate={{ 
-                x: isDarkMode ? 24 : 0,
-                backgroundColor: isDarkMode ? 'var(--accent-primary)' : '#fff'
-              }}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            >
-              {isDarkMode ? (
-                <Moon size={14} className="text-white" />
-              ) : (
-                <Sun size={14} className="text-amber-500" />
+            <div className="relative w-10 h-6 rounded-full transition-colors flex items-center p-1 bg-white dark:bg-slate-800 shadow-inner border border-black/5 dark:border-white/5">
+              <motion.div 
+                className="w-4 h-4 rounded-full shadow-md flex items-center justify-center overflow-hidden"
+                initial={false}
+                animate={{ 
+                  x: isDarkMode ? 16 : 0,
+                  backgroundColor: isDarkMode ? 'var(--accent-primary)' : '#f59e0b'
+                }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              >
+                {isDarkMode ? (
+                  <Moon size={10} className="text-white" />
+                ) : (
+                  <Sun size={10} className="text-white" />
+                )}
+              </motion.div>
+            </div>
+            
+            <AnimatePresence>
+              {isSidebarOpen && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10, width: 0 }}
+                  animate={{ opacity: 1, x: 0, width: 'auto' }}
+                  exit={{ opacity: 0, x: -10, width: 0 }}
+                  className="ml-3 flex flex-col overflow-hidden whitespace-nowrap"
+                >
+                  <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                    {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+                  </span>
+                  <span className="text-[8px] font-bold opacity-50" style={{ color: 'var(--text-secondary)' }}>
+                    Appearance
+                  </span>
+                </motion.div>
               )}
-            </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </motion.aside>
@@ -211,7 +234,8 @@ export default function Layout({ children }) {
         </div>
       </motion.main>
 
-      <AddConnectionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddConnectionModal />
+      <AddClusterModal />
     </div>
   )
 }

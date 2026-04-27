@@ -63,8 +63,8 @@ export default function FullDiary() {
           <div className="space-y-6">
             <button 
               onClick={() => navigate(`/person/${id}`)}
-              className="group flex items-center gap-3 px-5 py-2.5 rounded-2xl border bg-white/50 backdrop-blur-sm transition-all hover:scale-105 hover:bg-white shadow-sm"
-              style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
+              className="group flex items-center gap-3 px-5 py-2.5 rounded-2xl border backdrop-blur-sm transition-all hover:scale-105 shadow-sm"
+              style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)', backgroundColor: 'rgba(var(--bg-secondary-rgb), 0.5)' }}
             >
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
               <span className="text-[10px] font-black uppercase tracking-widest">Return to Profile</span>
@@ -80,11 +80,11 @@ export default function FullDiary() {
           </div>
 
           {/* Quick Stats Banner */}
-          <div className="flex items-center gap-4 bg-white/40 backdrop-blur-md p-2 rounded-[2.5rem] border shadow-sm self-start md:self-auto" style={{ borderColor: 'var(--border-color)' }}>
+          <div className="flex items-center gap-4 backdrop-blur-md p-2 rounded-[2.5rem] border shadow-sm self-start md:self-auto" style={{ borderColor: 'var(--border-color)', backgroundColor: 'rgba(var(--bg-secondary-rgb), 0.4)' }}>
             <StatCard icon={<FileText size={14} />} label="Total" value={totalEntries} color="var(--accent-primary)" />
-            <div className="w-px h-8 bg-slate-200" />
+            <div className="w-px h-8" style={{ backgroundColor: 'var(--border-color)' }} />
             <StatCard icon={<TrendingUp size={14} />} label="Avg Words" value={avgWords} color="var(--accent-primary)" />
-            <div className="w-px h-8 bg-slate-200" />
+            <div className="w-px h-8" style={{ backgroundColor: 'var(--border-color)' }} />
             <div className="px-5 py-2 text-center">
                <span className="block text-[8px] font-black uppercase tracking-widest opacity-30 mb-0.5">Focus</span>
                <span className="text-xs font-black uppercase tracking-widest text-emerald-600">High</span>
@@ -93,7 +93,7 @@ export default function FullDiary() {
         </div>
 
         {/* Toolbar: Search & Sort */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-[3rem] bg-white shadow-xl shadow-slate-200/50 border overflow-hidden" style={{ borderColor: 'var(--border-color)' }}>
+        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-[3rem] border overflow-hidden" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)', boxShadow: 'var(--glass-shadow)' }}>
           <div className="flex-1 w-full relative group">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 opacity-20 group-focus-within:opacity-100 transition-opacity" size={20} style={{ color: 'var(--accent-primary)' }} />
             <input 
@@ -108,8 +108,8 @@ export default function FullDiary() {
           <div className="w-full sm:w-auto flex items-center gap-2 pr-2">
             <button 
               onClick={() => setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')}
-              className="px-8 h-16 rounded-3xl bg-slate-50 border flex items-center gap-3 hover:bg-white transition-all group"
-              style={{ borderColor: 'var(--border-color)' }}
+              className="px-8 h-16 rounded-3xl border flex items-center gap-3 transition-all group"
+              style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}
             >
               {sortOrder === 'newest' ? <SortDesc size={18} className="opacity-40" /> : <SortAsc size={18} className="opacity-40" />}
               <span className="text-[10px] font-black uppercase tracking-widest min-w-[60px]">
@@ -123,7 +123,7 @@ export default function FullDiary() {
       {/* Diary Entries List */}
       <div className="grid grid-cols-1 gap-12 relative">
         {/* Timeline Path Line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-200 -translate-x-1/2 hidden lg:block opacity-40" />
+        <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 hidden lg:block opacity-40" style={{ backgroundColor: 'var(--border-color)' }} />
 
         <AnimatePresence mode="popLayout">
           {filteredAndSortedNotes.length > 0 ? (
@@ -138,16 +138,15 @@ export default function FullDiary() {
                 className={`relative flex flex-col ${index % 2 === 0 ? 'lg:items-start' : 'lg:items-end'}`}
               >
                 {/* Visual Connector Dot on Timeline */}
-                <div className="absolute left-1/2 top-14 w-4 h-4 rounded-full border-4 bg-white -translate-x-1/2 hidden lg:block z-10" 
-                     style={{ borderColor: 'var(--accent-primary)' }} />
+                <div className="absolute left-1/2 top-14 w-4 h-4 rounded-full border-4 -translate-x-1/2 hidden lg:block z-10" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--accent-primary)' }} />
 
                 <div className="w-full lg:w-[48%] group">
-                  <div className="relative p-10 rounded-[4rem] border bg-white shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-700 overflow-hidden"
-                    style={{ borderColor: 'var(--border-color)' }}>
+                  <div className="relative p-10 rounded-[4rem] border shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-700 overflow-hidden"
+                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
                     
                     {/* Entry Header */}
                     <div className="flex items-center gap-4 mb-10">
-                       <div className="w-14 h-14 rounded-[1.5rem] border flex items-center justify-center bg-slate-50 transition-colors group-hover:bg-emerald-50" 
+                       <div className="w-14 h-14 rounded-[1.5rem] border flex items-center justify-center transition-colors" 
                             style={{ borderColor: 'var(--border-color)', color: 'var(--accent-primary)' }}>
                          <CalendarDays size={24} />
                        </div>
@@ -174,7 +173,7 @@ export default function FullDiary() {
                         "{note.content}"
                       </p>
                       {/* Gradient Fade for Truncation */}
-                      <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent group-hover:opacity-0 pointer-events-none transition-opacity duration-500" />
+                      <div className="absolute bottom-0 left-0 w-full h-16 group-hover:opacity-0 pointer-events-none transition-opacity duration-500" style={{ background: 'linear-gradient(to top, var(--bg-secondary), transparent)' }} />
                     </div>
 
                     {/* Subtle Entry ID / Index */}
@@ -189,10 +188,10 @@ export default function FullDiary() {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="py-40 text-center rounded-[5rem] border-2 border-dashed flex flex-col items-center gap-8 bg-slate-50/50" 
-              style={{ borderColor: 'var(--border-color)' }}
+              className="py-40 text-center rounded-[5rem] border-2 border-dashed flex flex-col items-center gap-8" 
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'rgba(var(--bg-secondary-rgb), 0.5)' }}
             >
-               <div className="w-24 h-24 rounded-[2.5rem] bg-white shadow-2xl border flex items-center justify-center opacity-30">
+               <div className="w-24 h-24 rounded-[2.5rem] shadow-2xl border flex items-center justify-center opacity-30" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                  <BookOpen size={48} className="text-slate-400" />
                </div>
                <div className="space-y-2">

@@ -176,7 +176,15 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <p className="font-black text-sm tracking-tight" style={{ color: 'var(--text-primary)' }}>{g.name}</p>
-                      <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>{g.count} people</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>{g.count} people</p>
+                        {g.description && (
+                          <>
+                            <span className="w-0.5 h-0.5 rounded-full bg-slate-400 opacity-30" />
+                            <p className="text-[10px] font-medium opacity-40 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>{g.description}</p>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <ChevronRight size={16} className="opacity-30 group-hover:opacity-100 transition-opacity"

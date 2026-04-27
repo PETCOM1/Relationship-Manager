@@ -6,18 +6,25 @@ import FamilyTree from './pages/FamilyTree'
 import PersonProfile from './pages/PersonProfile'
 import FullDiary from './pages/FullDiary'
 
+import PublicProfile from './pages/PublicProfile'
+
 function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/group/:groupId" element={<GroupView />} />
-        <Route path="/family-tree" element={<FamilyTree />} />
-        <Route path="/person/:id" element={<PersonProfile />} />
-        <Route path="/person/:id/diary" element={<FullDiary />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </Layout>
+    <Routes>
+      <Route path="/share/:id" element={<PublicProfile />} />
+      <Route path="/*" element={
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/group/:groupId" element={<GroupView />} />
+            <Route path="/family-tree" element={<FamilyTree />} />
+            <Route path="/person/:id" element={<PersonProfile />} />
+            <Route path="/person/:id/diary" element={<FullDiary />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout>
+      } />
+    </Routes>
   )
 }
 

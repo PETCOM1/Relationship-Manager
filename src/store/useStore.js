@@ -108,8 +108,11 @@ export const useStore = create(
       ],
       searchQuery: '',
       isDarkMode: true,
+      modalConfig: { isOpen: false, type: null, data: {} },
 
       // Actions
+      openModal: (type, data = {}) => set({ modalConfig: { isOpen: true, type, data } }),
+      closeModal: () => set({ modalConfig: { isOpen: false, type: null, data: {} } }),
       setSearchQuery: (query) => set({ searchQuery: query }),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       addPerson: (person) => set((state) => ({ people: [...state.people, { ...person, id: Math.random().toString(36).substr(2, 9) }] })),
@@ -117,6 +120,9 @@ export const useStore = create(
         people: state.people.map(p => p.id === id ? { ...p, ...updates } : p)
       })),
       addRelationship: (rel) => set((state) => ({ relationships: [...state.relationships, rel] })),
+      addGroup: (group) => set((state) => ({ 
+        groups: [...state.groups, { ...group, id: group.name.toLowerCase().replace(/\s+/g, '-') }] 
+      })),
       deletePerson: (id) => set((state) => ({
         people: state.people.filter(p => p.id !== id),
         relationships: state.relationships.filter(r => r.fromId !== id && r.toId !== id)

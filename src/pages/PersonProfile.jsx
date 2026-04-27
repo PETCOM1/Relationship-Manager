@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ArrowLeft, Mail, Phone, Calendar, MapPin, 
   Link as LinkIcon, Share2, Heart, MessageSquare, 
@@ -13,6 +13,14 @@ export default function PersonProfile() {
   const navigate = useNavigate()
   const { people, relationships, groups, addNote, deleteNote } = useStore()
   const [noteText, setNoteText] = useState('')
+  const [showShareToast, setShowShareToast] = useState(false)
+
+  const handleShare = () => {
+    const shareUrl = `${window.location.origin}/share/${id}`
+    navigator.clipboard.writeText(shareUrl)
+    setShowShareToast(true)
+    setTimeout(() => setShowShareToast(false), 3000)
+  }
 
   const person = useMemo(() => people.find(p => p.id === id), [people, id])
   
@@ -53,18 +61,37 @@ export default function PersonProfile() {
       <div className="flex items-center justify-between mb-4">
         <button 
           onClick={() => navigate(-1)}
-          className="group flex items-center gap-3 px-4 py-2 rounded-2xl border bg-white/50 backdrop-blur-sm transition-all hover:scale-105"
-          style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
+          className="group flex items-center gap-3 px-4 py-2 rounded-2xl border backdrop-blur-sm transition-all hover:scale-105"
+          style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)', backgroundColor: 'rgba(var(--bg-secondary-rgb), 0.5)' }}
         >
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
           <span className="text-[10px] font-black uppercase tracking-widest">Back to Directory</span>
         </button>
 
-        <div className="flex items-center gap-2">
-           <button className="p-2.5 rounded-2xl border bg-white shadow-sm hover:scale-110 transition-transform" style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
+        <div className="flex items-center gap-2 relative">
+           <AnimatePresence>
+             {showShareToast && (
+               <motion.div 
+                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                 animate={{ opacity: 1, y: 0, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.9 }}
+                 className="absolute -top-12 right-0 px-4 py-2 rounded-xl bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest shadow-lg whitespace-nowrap z-50"
+               >
+                 Public Link Copied!
+               </motion.div>
+             )}
+           </AnimatePresence>
+           <button 
+             onClick={handleShare}
+             className="p-2.5 rounded-2xl border shadow-sm hover:scale-110 transition-transform relative group/share" 
+             style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)', backgroundColor: 'var(--bg-secondary)' }}
+           >
              <Share2 size={16} />
+             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white text-[8px] font-black uppercase rounded-md opacity-0 group-hover/share:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+               Share Public Profile
+             </div>
            </button>
-           <button className="p-2.5 rounded-2xl border bg-white shadow-sm hover:scale-110 transition-transform" style={{ borderColor: 'var(--border-color)', color: 'var(--accent-primary)' }}>
+           <button className="p-2.5 rounded-2xl border shadow-sm hover:scale-110 transition-transform" style={{ borderColor: 'var(--border-color)', color: 'var(--accent-primary)', backgroundColor: 'var(--bg-secondary)' }}>
              <Heart size={16} />
            </button>
         </div>
@@ -121,7 +148,7 @@ export default function PersonProfile() {
         
         {/* Sidebar Info */}
         <div className="space-y-6">
-          <div className="p-6 rounded-[2rem] border bg-white/30 backdrop-blur-md shadow-sm" style={{ borderColor: 'var(--border-color)' }}>
+          <div className="p-6 rounded-[2rem] border backdrop-blur-md shadow-sm" style={{ borderColor: 'var(--border-color)', backgroundColor: 'rgba(var(--bg-secondary-rgb), 0.6)' }}>
             <h3 className="text-xs font-black uppercase tracking-widest opacity-50 mb-6" style={{ color: 'var(--text-secondary)' }}>Details</h3>
             <div className="space-y-5">
               {[
@@ -150,8 +177,8 @@ export default function PersonProfile() {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Biography Card */}
-          <div className="p-8 rounded-[2.5rem] border bg-white shadow-sm border-t-8" 
-            style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--accent-primary)' }}>
+          <div className="p-8 rounded-[2.5rem] border shadow-sm border-t-8" 
+            style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--accent-primary)', backgroundColor: 'var(--bg-secondary)' }}>
             <div className="flex items-center gap-3 mb-6">
               <BookOpen size={20} style={{ color: 'var(--accent-primary)' }} />
               <h2 className="text-xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>The Story</h2>
@@ -160,16 +187,7 @@ export default function PersonProfile() {
               {person.info}. {person.name} has been an integral part of the {group?.name.toLowerCase()} circle, consistently contributing to the shared values and growth of the collective. 
               Our relationship is characterized by mutual respect and a shared history that spans across many successful collaborations.
             </p>
-            <div className="flex gap-4">
-              <div className="flex-1 p-4 rounded-2xl bg-slate-50 border" style={{ borderColor: 'var(--border-color)' }}>
-                <p className="text-[10px] font-black uppercase opacity-40 mb-1" style={{ color: 'var(--text-secondary)' }}>Strengths</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {['Reliability', 'Insight', 'Action'].map(s => (
-                    <span key={s} className="px-2 py-0.5 rounded-md bg-white border text-[9px] font-bold" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>{s}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
+
           </div>
 
           {/* Lattice and Diary removed from here */}
@@ -185,7 +203,7 @@ export default function PersonProfile() {
           </div>
           
           {/* Quick Entry Area */}
-          <div className="p-8 rounded-[3rem] border bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: 'var(--border-color)' }}>
+          <div className="p-8 rounded-[3rem] border backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow" style={{ borderColor: 'var(--border-color)', backgroundColor: 'rgba(var(--bg-secondary-rgb), 0.5)' }}>
             <textarea 
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
@@ -218,12 +236,12 @@ export default function PersonProfile() {
                     key={note.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col gap-5 p-8 rounded-[3rem] border bg-white shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
-                    style={{ borderColor: 'var(--border-color)' }}
+                    className="flex flex-col gap-5 p-8 rounded-[3rem] border shadow-sm hover:shadow-md transition-all group relative overflow-hidden"
+                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="p-3 rounded-2xl border bg-slate-50" style={{ borderColor: 'var(--border-color)', color: 'var(--accent-primary)' }}>
+                        <div className="p-3 rounded-2xl border" style={{ borderColor: 'var(--border-color)', color: 'var(--accent-primary)', backgroundColor: 'var(--bg-primary)' }}>
                           <Clock size={16} />
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest opacity-40" style={{ color: 'var(--text-secondary)' }}>
@@ -243,7 +261,7 @@ export default function PersonProfile() {
                         "{note.content}"
                       </p>
                       {/* Gradient Fade for Truncation */}
-                      <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent group-hover:opacity-0 pointer-events-none transition-opacity duration-500" />
+                      <div className="absolute bottom-0 left-0 w-full h-12 group-hover:opacity-0 pointer-events-none transition-opacity duration-500" style={{ background: 'linear-gradient(to top, var(--bg-secondary), transparent)' }} />
                     </div>
                   </motion.div>
                 ))}
@@ -262,7 +280,7 @@ export default function PersonProfile() {
             <div className="flex justify-center pt-6">
               <Link 
                 to={`/person/${person.id}/diary`}
-                className="group px-12 py-5 rounded-[2.5rem] border border-dashed text-[11px] font-black uppercase tracking-[0.3em] hover:bg-white transition-colors flex items-center gap-4"
+                className="group px-12 py-5 rounded-[2.5rem] border border-dashed text-[11px] font-black uppercase tracking-[0.3em] transition-colors flex items-center gap-4"
                 style={{ color: 'var(--accent-primary)', borderColor: 'var(--border-color)' }}
               >
                 Browse Full History <ArrowLeft size={16} className="rotate-180 group-hover:translate-x-1 transition-transform" />
@@ -284,8 +302,8 @@ export default function PersonProfile() {
              <Link to={`/person/${conn.person.id}`} key={i}>
                <motion.div 
                  whileHover={{ scale: 1.05, y: -4 }}
-                 className="p-5 rounded-[2rem] border bg-white shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 relative overflow-hidden group"
-                 style={{ borderColor: 'var(--border-color)' }}
+                 className="p-5 rounded-[2rem] border shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 relative overflow-hidden group"
+                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}
                >
                  <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                  <img src={conn.person.photo} className="w-12 h-12 rounded-2xl object-cover shadow-sm" alt="" />
@@ -297,7 +315,7 @@ export default function PersonProfile() {
              </Link>
            ))}
            {connections.length === 0 && (
-             <div className="col-span-full py-12 text-center text-xs font-bold opacity-20 italic bg-white/50 rounded-[2rem] border border-dashed" style={{ borderColor: 'var(--border-color)' }}>No publicly mapped connections available.</div>
+             <div className="col-span-full py-12 text-center text-xs font-bold opacity-20 italic rounded-[2rem] border border-dashed" style={{ borderColor: 'var(--border-color)', backgroundColor: 'rgba(var(--bg-secondary-rgb), 0.5)' }}>No publicly mapped connections available.</div>
            )}
          </div>
       </div>

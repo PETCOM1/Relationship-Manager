@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, UserPlus, Link, Check, User } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
-export default function AddConnectionModal({ isOpen, onClose }) {
-  const { groups, people, addPerson, addRelationship } = useStore()
+export default function AddConnectionModal() {
+  const { groups, people, addPerson, addRelationship, modalConfig, closeModal } = useStore()
+  const { isOpen, type, data: initialData } = modalConfig
+  
   const [formData, setFormData] = useState({
     name: '',
     role: '',
@@ -15,20 +17,37 @@ export default function AddConnectionModal({ isOpen, onClose }) {
     relType: 'partner'
   })
 
+  useEffect(() => {
+    if (isOpen && initialData?.groupId) {
+      setFormData(prev => ({
+        ...prev,
+        groupId: initialData.groupId,
+        name: '',
+        role: '',
+        info: '',
+        relatedTo: '',
+      }))
+    }
+  }, [isOpen, initialData])
+
   const handleSubmit = () => {
     const newId = Math.random().toString(36).substr(2, 9)
     addPerson({ ...formData, id: newId })
     if (formData.relatedTo) {
       addRelationship({ fromId: formData.relatedTo, toId: newId, type: formData.relType })
     }
-    onClose()
+    closeModal()
   }
 
-  if (!isOpen) return null
+  if (!isOpen || type !== 'addConnection') return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px]">
+    <div 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px]"
+      onClick={closeModal}
+    >
       <motion.div 
+        onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.98 }}
@@ -44,7 +63,7 @@ export default function AddConnectionModal({ isOpen, onClose }) {
               </h2>
               <p className="text-[10px] font-bold opacity-60" style={{ color: 'var(--text-secondary)' }}>Expand your network.</p>
             </div>
-            <button onClick={onClose} className="p-1.5 rounded-full transition-colors hover:bg-slate-500/10" style={{ color: 'var(--text-secondary)' }}>
+            <button onClick={closeModal} className="p-1.5 rounded-full transition-colors hover:bg-slate-500/10" style={{ color: 'var(--text-secondary)' }}>
               <X size={18} />
             </button>
           </header>
@@ -76,6 +95,18 @@ export default function AddConnectionModal({ isOpen, onClose }) {
             </div>
 
             <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest pl-1 opacity-60" style={{ color: 'var(--text-secondary)' }}>Photo URL</label>
+              <input 
+                type="text" 
+                value={formData.photo}
+                onChange={e => setFormData({...formData, photo: e.target.value})}
+                className="w-full border rounded-xl py-2 px-3 text-sm outline-none transition-all shadow-sm focus:ring-1"
+                style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)', '--tw-ring-color': 'var(--accent-primary)' }}
+                placeholder="https://i.pravatar.cc/150?u=new"
+              />
+            </div>
+
+            <div className="space-y-1.5">
               <label className="text-[9px] font-black uppercase tracking-widest pl-1 opacity-60" style={{ color: 'var(--text-secondary)' }}>Role / Title</label>
               <input 
                 type="text" 
@@ -84,6 +115,18 @@ export default function AddConnectionModal({ isOpen, onClose }) {
                 className="w-full border rounded-xl py-2 px-3 text-sm outline-none transition-all shadow-sm focus:ring-1"
                 style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)', '--tw-ring-color': 'var(--accent-primary)' }}
                 placeholder="e.g. Mentor, Cousin"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest pl-1 opacity-60" style={{ color: 'var(--text-secondary)' }}>Bio / Notes</label>
+              <textarea 
+                value={formData.info}
+                onChange={e => setFormData({...formData, info: e.target.value})}
+                rows={2}
+                className="w-full border rounded-xl py-2 px-3 text-sm outline-none transition-all shadow-sm focus:ring-1 resize-none"
+                style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)', '--tw-ring-color': 'var(--accent-primary)' }}
+                placeholder="Known for his wisdom..."
               />
             </div>
 
@@ -118,7 +161,7 @@ export default function AddConnectionModal({ isOpen, onClose }) {
 
           <footer className="pt-2 flex items-center justify-end space-x-3">
             <button 
-              onClick={onClose}
+              onClick={closeModal}
               className="px-4 py-2 text-xs font-bold transition-colors hover:opacity-70"
               style={{ color: 'var(--text-secondary)' }}
             >
