@@ -7,6 +7,7 @@ import PersonProfile from './pages/PersonProfile'
 import FullDiary from './pages/FullDiary'
 
 import PublicProfile from './pages/PublicProfile'
+import AllClusters from './pages/AllClusters'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/clusters" element={<AllClusters />} />
             <Route path="/group/:groupId" element={<GroupView />} />
             <Route path="/family-tree" element={<FamilyTree />} />
             <Route path="/person/:id" element={<PersonProfile />} />

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   UserPlus, Home, Layers, 
   Network, Moon, Sun,
-  Users, Heart, Briefcase, GraduationCap
+  Users, Heart, Briefcase, GraduationCap, MoreHorizontal
 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import AddConnectionModal from './AddConnectionModal'
@@ -43,7 +43,7 @@ export default function Layout({ children }) {
           boxShadow: 'var(--glass-shadow)'
         }}
       >
-        <div className="p-6 flex items-center justify-between">
+        <div className="p-5 flex items-center justify-between">
           <div className="flex items-center space-x-3">
              <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden shadow-lg border border-white/10" 
                   style={{ background: 'linear-gradient(135deg, var(--accent-primary) 0%, #059669 100%)' }}>
@@ -66,10 +66,10 @@ export default function Layout({ children }) {
           </div>
         </div>
 
-        <div className="px-4 mb-6">
+        <div className="px-4 mb-4">
           <button 
             onClick={() => openModal('addCluster')}
-            className="w-full h-12 rounded-2xl flex items-center justify-center space-x-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md relative overflow-hidden group"
+            className="w-full h-12 rounded-2xl flex items-center justify-center transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm hover:shadow-md relative overflow-hidden group"
             style={{ 
               background: 'linear-gradient(135deg, var(--accent-primary) 0%, #10B981 100%)',
               color: 'white'
@@ -80,9 +80,9 @@ export default function Layout({ children }) {
             <AnimatePresence>
               {isSidebarOpen && (
                 <motion.span 
-                  initial={{ opacity: 0, x: -10, width: 0 }}
-                  animate={{ opacity: 1, x: 0, width: 'auto' }}
-                  exit={{ opacity: 0, x: -10, width: 0 }}
+                  initial={{ opacity: 0, x: -10, width: 0, marginLeft: 0 }}
+                  animate={{ opacity: 1, x: 0, width: 'auto', marginLeft: 8 }}
+                  exit={{ opacity: 0, x: -10, width: 0, marginLeft: 0 }}
                   className="font-bold text-sm relative z-10 overflow-hidden whitespace-nowrap"
                 >
                   New Cluster
@@ -111,17 +111,17 @@ export default function Layout({ children }) {
           <AnimatePresence>
             {isSidebarOpen && (
               <motion.div 
-                initial={{ opacity: 0, y: -10, height: 0 }}
+                initial={{ opacity: 0, y: -5, height: 0 }}
                 animate={{ opacity: 0.6, y: 0, height: 'auto' }}
-                exit={{ opacity: 0, y: -10, height: 0 }}
-                className="pt-8 pb-3 px-4 overflow-hidden"
+                exit={{ opacity: 0, y: -5, height: 0 }}
+                className="pt-4 pb-2 px-4 overflow-hidden"
               >
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>Clusters</span>
               </motion.div>
             )}
           </AnimatePresence>
           
-          {groups.map(group => {
+          {groups.slice(0, 4).map(group => {
             const IconComponent = {
               Users,
               Heart,
@@ -140,20 +140,32 @@ export default function Layout({ children }) {
               />
             )
           })}
+
+          {groups.length > 4 && (
+            <NavItem 
+              to="/clusters" 
+              icon={<MoreHorizontal size={20} />} 
+              label="See All Clusters" 
+              active={location.pathname === '/clusters'}
+              isSidebarOpen={isSidebarOpen}
+            />
+          )}
         </nav>
 
 
 
-        <div className="p-4 border-t transition-colors" style={{ borderColor: 'var(--border-color)' }}>
+        <div className={`p-4 border-t transition-colors ${!isSidebarOpen && 'flex justify-center'}`} style={{ borderColor: 'var(--border-color)' }}>
           <div 
             onClick={toggleDarkMode}
-            className={`flex items-center rounded-[1.25rem] cursor-pointer transition-all duration-300 relative group/toggle ${isDarkMode ? 'bg-emerald-500/10' : 'bg-slate-100 dark:bg-white/5'}`}
+            className={`flex items-center rounded-[1.25rem] cursor-pointer transition-all duration-300 relative group/toggle ${
+              isDarkMode ? 'bg-emerald-500/10' : 'bg-slate-100 dark:bg-white/5'
+            } ${isSidebarOpen ? 'w-full' : 'w-12 h-12 justify-center'}`}
             style={{ 
-              padding: isSidebarOpen ? '12px 16px' : '12px',
+              padding: isSidebarOpen ? '12px 16px' : '0',
               border: '1px solid var(--border-color)'
             }}
           >
-            <div className="relative w-10 h-6 rounded-full transition-colors flex items-center p-1 bg-white dark:bg-slate-800 shadow-inner border border-black/5 dark:border-white/5">
+            <div className="relative w-10 h-6 rounded-full transition-colors flex items-center p-1 bg-white dark:bg-slate-800 shadow-inner border border-black/5 dark:border-white/5 shrink-0">
               <motion.div 
                 className="w-4 h-4 rounded-full shadow-md flex items-center justify-center overflow-hidden"
                 initial={false}
@@ -174,10 +186,10 @@ export default function Layout({ children }) {
             <AnimatePresence>
               {isSidebarOpen && (
                 <motion.div
-                  initial={{ opacity: 0, x: -10, width: 0 }}
-                  animate={{ opacity: 1, x: 0, width: 'auto' }}
-                  exit={{ opacity: 0, x: -10, width: 0 }}
-                  className="ml-3 flex flex-col overflow-hidden whitespace-nowrap"
+                  initial={{ opacity: 0, x: -10, width: 0, marginLeft: 0 }}
+                  animate={{ opacity: 1, x: 0, width: 'auto', marginLeft: 12 }}
+                  exit={{ opacity: 0, x: -10, width: 0, marginLeft: 0 }}
+                  className="flex flex-col overflow-hidden whitespace-nowrap"
                 >
                   <span className="text-[10px] font-black uppercase tracking-tight" style={{ color: 'var(--text-primary)' }}>
                     {isDarkMode ? 'Dark Mode' : 'Light Mode'}
@@ -242,9 +254,9 @@ export default function Layout({ children }) {
 
 function NavItem({ to, icon, label, active, isSidebarOpen }) {
   return (
-    <Link to={to} className="block group">
+    <Link to={to} className="block group mb-1">
       <div 
-        className={`flex items-center space-x-4 p-4 rounded-[1.25rem] transition-all duration-300 relative ${active ? 'shadow-lg shadow-emerald-500/20' : 'hover:bg-white/5 dark:hover:bg-white/5'}`}
+        className={`flex items-center py-3 px-4 rounded-[1.25rem] transition-all duration-300 relative ${active ? 'shadow-lg shadow-emerald-500/20' : 'hover:bg-white/5 dark:hover:bg-white/5'}`}
         style={{ 
           background: active ? 'linear-gradient(135deg, var(--accent-primary) 0%, #059669 100%)' : 'transparent',
           color: active ? 'white' : 'var(--text-secondary)',
@@ -257,9 +269,9 @@ function NavItem({ to, icon, label, active, isSidebarOpen }) {
         <AnimatePresence>
           {isSidebarOpen && (
             <motion.span 
-              initial={{ opacity: 0, x: -10, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: 'auto' }}
-              exit={{ opacity: 0, x: -10, width: 0 }}
+              initial={{ opacity: 0, x: -10, width: 0, marginLeft: 0 }}
+              animate={{ opacity: 1, x: 0, width: 'auto', marginLeft: 16 }}
+              exit={{ opacity: 0, x: -10, width: 0, marginLeft: 0 }}
               className={`font-bold text-sm tracking-tight overflow-hidden whitespace-nowrap ${active ? 'text-white' : ''}`}
             >
               {label}

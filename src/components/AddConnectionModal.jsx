@@ -12,9 +12,9 @@ export default function AddConnectionModal() {
     role: '',
     info: '',
     groupId: 'family',
-    photo: 'https://i.pravatar.cc/150',
+    photo: '',
     relatedTo: '',
-    relType: 'partner'
+    relType: 'none'
   })
 
   useEffect(() => {
@@ -25,16 +25,41 @@ export default function AddConnectionModal() {
         name: '',
         role: '',
         info: '',
+        photo: '',
         relatedTo: '',
+        relType: 'none'
       }))
+    } else if (isOpen && !initialData?.groupId) {
+      setFormData({
+        name: '',
+        role: '',
+        info: '',
+        groupId: 'family',
+        photo: '',
+        relatedTo: '',
+        relType: 'none'
+      })
     }
   }, [isOpen, initialData])
 
   const handleSubmit = () => {
     const newId = Math.random().toString(36).substr(2, 9)
-    addPerson({ ...formData, id: newId })
-    if (formData.relatedTo) {
-      addRelationship({ fromId: formData.relatedTo, toId: newId, type: formData.relType })
+    // fallback photo if empty
+    const finalPhoto = formData.photo.trim() || `https://i.pravatar.cc/150?u=${newId}`
+    addPerson({ ...formData, id: newId, photo: finalPhoto })
+    
+    if (formData.relType !== 'none' && formData.relatedTo) {
+      if (formData.relType === 'child_of') {
+        // relatedTo is parent of newId
+        addRelationship({ fromId: formData.relatedTo, toId: newId, type: 'parent' })
+      } else if (formData.relType === 'parent_of') {
+        // newId is parent of relatedTo
+        addRelationship({ fromId: newId, toId: formData.relatedTo, type: 'parent' })
+      } else if (formData.relType === 'partner_of') {
+        addRelationship({ fromId: formData.relatedTo, toId: newId, type: 'partner' })
+      } else if (formData.relType === 'friend_of') {
+        addRelationship({ fromId: formData.relatedTo, toId: newId, type: 'friend' })
+      }
     }
     closeModal()
   }
@@ -130,31 +155,45 @@ export default function AddConnectionModal() {
               />
             </div>
 
-            <div className="p-4 rounded-xl border transition-colors space-y-3" style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}>
+            <div className="p-4 rounded-xl border transition-colors space-y-4" style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}>
               <div className="flex items-center space-x-2 opacity-60" style={{ color: 'var(--text-secondary)' }}>
                 <Link size={14} />
                 <span className="text-[10px] font-black uppercase tracking-tight">Link Relationship</span>
               </div>
               
-              <div className="grid grid-cols-2 gap-3">
-                <select 
-                  value={formData.relatedTo}
-                  onChange={e => setFormData({...formData, relatedTo: e.target.value})}
-                  className="rounded-lg py-1.5 px-2 text-[10px] outline-none border transition-colors"
-                  style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-                >
-                  <option value="">No link</option>
-                  {people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
+              <div className="flex flex-col gap-3">
                 <select 
                   value={formData.relType}
-                  onChange={e => setFormData({...formData, relType: e.target.value})}
-                  className="rounded-lg py-1.5 px-2 text-[10px] outline-none border transition-colors"
+                  onChange={e => setFormData({...formData, relType: e.target.value, relatedTo: ''})}
+                  className="rounded-lg py-2 px-3 text-sm outline-none border transition-colors w-full"
                   style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
                 >
-                  <option value="partner">Partner</option>
-                  <option value="parent">Parent of</option>
+                  <option value="none">No relationship linked</option>
+                  {formData.groupId === 'family' ? (
+                    <>
+                      <option value="child_of">Is a Child of...</option>
+                      <option value="partner_of">Is a Partner of...</option>
+                      <option value="parent_of">Is a Parent of...</option>
+                    </>
+                  ) : (
+                    <option value="friend_of">Is connected to...</option>
+                  )}
                 </select>
+
+                {formData.relType !== 'none' && (
+                  <select 
+                    value={formData.relatedTo}
+                    onChange={e => setFormData({...formData, relatedTo: e.target.value})}
+                    className="rounded-lg py-2 px-3 text-sm outline-none border transition-colors w-full"
+                    style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+                  >
+                    <option value="">Select a member...</option>
+                    {people
+                      .filter(p => p.groupId === formData.groupId)
+                      .map(p => <option key={p.id} value={p.id}>{p.name}</option>)
+                    }
+                  </select>
+                )}
               </div>
             </div>
           </div>

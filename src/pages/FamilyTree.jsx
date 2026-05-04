@@ -19,25 +19,32 @@ function MemberCard({ person, index }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.04 }}
         whileHover={{ y: -4, scale: 1.02 }}
-        className="p-5 rounded-2xl border flex flex-col items-center text-center gap-3 group cursor-pointer transition-all shadow-sm hover:shadow-lg"
-        style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+        className="p-5 rounded-[2rem] border flex flex-col items-center text-center gap-3 group cursor-pointer transition-all shadow-sm hover:shadow-lg relative overflow-hidden"
+        style={{ 
+          background: 'rgba(var(--bg-secondary-rgb), 0.7)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderColor: 'var(--glass-border)',
+          boxShadow: 'var(--glass-shadow)'
+        }}
       >
-        <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative z-10">
           <img
             src={person.photo}
             alt={person.name}
-            className="w-16 h-16 rounded-2xl object-cover border-2 grayscale group-hover:grayscale-0 transition-all duration-500 shadow"
+            className="w-16 h-16 rounded-[1.25rem] object-cover border-2 grayscale group-hover:grayscale-0 transition-all duration-500 shadow-md"
             style={{ borderColor: 'var(--border-color)' }}
           />
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 flex items-center justify-center"
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-sm"
             style={{ backgroundColor: 'var(--accent-primary)', borderColor: 'var(--bg-secondary)' }}>
-            <User size={9} className="text-white" />
+            <User size={12} className="text-white" />
           </div>
         </div>
-        <div className="min-w-0 w-full">
-          <p className="text-xs font-black tracking-tight truncate hover:text-emerald-500 transition-colors" style={{ color: 'var(--text-primary)' }}>{person.name}</p>
-          <p className="text-[10px] font-black uppercase tracking-widest mt-0.5" style={{ color: 'var(--accent-primary)' }}>{person.role}</p>
-          <p className="text-[10px] mt-1 opacity-50 truncate font-medium" style={{ color: 'var(--text-secondary)' }}>{person.info}</p>
+        <div className="min-w-0 w-full relative z-10">
+          <p className="text-xs font-black tracking-tight truncate group-hover:text-emerald-500 transition-colors" style={{ color: 'var(--text-primary)' }}>{person.name}</p>
+          <p className="text-[10px] font-black uppercase tracking-widest mt-1" style={{ color: 'var(--accent-primary)' }}>{person.role}</p>
+          <p className="text-[10px] mt-1.5 opacity-60 truncate font-medium" style={{ color: 'var(--text-secondary)' }}>{person.info}</p>
         </div>
       </motion.div>
     </Link>
@@ -92,6 +99,7 @@ export default function FamilyTree() {
   const { people, relationships, searchQuery } = useStore()
   const [view, setView] = useState('tree') // 'tree' | 'members'
   const [page, setPage] = useState(1)
+  const [treeKey, setTreeKey] = useState(0)
 
   const familyMembers = useMemo(
     () => people.filter(p => p.groupId === 'family' && 
@@ -114,74 +122,88 @@ export default function FamilyTree() {
           <div className="flex flex-col items-center justify-center h-full w-full p-2" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center space-x-4">
               {/* Main Person */}
-              <motion.div
-                whileHover={nodeDatum.attributes?.id ? { scale: 1.05 } : {}}
-                onClick={(e) => {
-                  if (nodeDatum.attributes?.id) {
-                    e.stopPropagation()
-                    navigate(`/person/${nodeDatum.attributes?.id}`)
-                  }
-                }}
-                className={`w-40 border-2 rounded-2xl p-4 shadow-xl transition-all relative overflow-hidden ${nodeDatum.attributes?.id ? 'cursor-pointer group' : 'cursor-default'}`}
-                style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="flex flex-col items-center text-center space-y-3 relative z-10">
-                  <div className="relative">
-                    <img
-                      src={nodeDatum.attributes?.photo}
-                      className="w-14 h-14 rounded-full border-2 grayscale group-hover:grayscale-0 transition-all duration-500 object-cover shadow-md"
-                      style={{ borderColor: 'var(--bg-primary)' }}
-                      alt=""
-                    />
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border shadow-md"
-                      style={{ backgroundColor: 'var(--accent-primary)', borderColor: 'var(--bg-secondary)' }}>
-                      <User size={10} className="text-white" />
+                <motion.div
+                  whileHover={nodeDatum.attributes?.id ? { scale: 1.05 } : {}}
+                  onClick={(e) => {
+                    if (nodeDatum.attributes?.id) {
+                      e.stopPropagation()
+                      navigate(`/person/${nodeDatum.attributes?.id}`)
+                    }
+                  }}
+                  className={`w-40 border rounded-[2rem] p-5 shadow-xl transition-all relative overflow-hidden ${nodeDatum.attributes?.id ? 'cursor-pointer group' : 'cursor-default'}`}
+                  style={{ 
+                    background: 'rgba(var(--bg-secondary-rgb), 0.75)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    borderColor: 'var(--glass-border)',
+                    boxShadow: 'var(--glass-shadow)'
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex flex-col items-center text-center space-y-3 relative z-10">
+                    <div className="relative">
+                      <img
+                        src={nodeDatum.attributes?.photo}
+                        className="w-16 h-16 rounded-full border-[3px] grayscale group-hover:grayscale-0 transition-all duration-500 object-cover shadow-lg"
+                        style={{ borderColor: 'rgba(var(--bg-secondary-rgb), 0.8)' }}
+                        alt=""
+                      />
+                      <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center border-2 shadow-md"
+                        style={{ backgroundColor: 'var(--accent-primary)', borderColor: 'var(--bg-secondary)' }}>
+                        <User size={10} className="text-white" />
+                      </div>
+                    </div>
+                    <div className="leading-tight space-y-1">
+                      <h4 className="text-[12px] font-black uppercase tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                        {nodeDatum.name}
+                      </h4>
+                      <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--accent-primary)' }}>
+                        {nodeDatum.attributes?.role}
+                      </p>
                     </div>
                   </div>
-                  <div className="leading-tight">
-                    <h4 className="text-[11px] font-black uppercase tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                      {nodeDatum.name}
-                    </h4>
-                    <p className="text-[8px] font-black uppercase tracking-[0.1em] opacity-70" style={{ color: 'var(--accent-primary)' }}>
-                      {nodeDatum.attributes?.role}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+                </motion.div>
 
               {/* Partner */}
               {isPartnered && (
                 <>
-                  <div className="w-6 h-0.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--accent-primary)', opacity: 0.3 }} />
+                  <div className="w-10 h-1 rounded-full shrink-0 relative overflow-hidden" style={{ backgroundColor: 'var(--border-color)' }}>
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-rose-500 opacity-60" />
+                  </div>
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     onClick={(e) => {
                       e.stopPropagation()
                       navigate(`/person/${nodeDatum.attributes?.partnerId}`)
                     }}
-                    className="w-40 border-2 rounded-2xl p-4 shadow-xl transition-all cursor-pointer group relative overflow-hidden"
-                    style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+                    className="w-40 border rounded-[2rem] p-5 shadow-xl transition-all cursor-pointer group relative overflow-hidden"
+                    style={{ 
+                      background: 'rgba(var(--bg-secondary-rgb), 0.75)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      borderColor: 'var(--glass-border)',
+                      boxShadow: 'var(--glass-shadow)'
+                    }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="flex flex-col items-center text-center space-y-3 relative z-10">
                       <div className="relative">
                         <img
                           src={nodeDatum.attributes?.partnerPhoto}
-                          className="w-14 h-14 rounded-full border-2 grayscale group-hover:grayscale-0 transition-all duration-500 object-cover shadow-md"
-                          style={{ borderColor: 'var(--bg-primary)' }}
+                          className="w-16 h-16 rounded-full border-[3px] grayscale group-hover:grayscale-0 transition-all duration-500 object-cover shadow-lg"
+                          style={{ borderColor: 'rgba(var(--bg-secondary-rgb), 0.8)' }}
                           alt=""
                         />
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border shadow-md"
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center border-2 shadow-md"
                           style={{ backgroundColor: '#f43f5e', borderColor: 'var(--bg-secondary)' }}>
                           <Users size={10} className="text-white" />
                         </div>
                       </div>
-                      <div className="leading-tight">
-                        <h4 className="text-[11px] font-black uppercase tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                      <div className="leading-tight space-y-1">
+                        <h4 className="text-[12px] font-black uppercase tracking-tight" style={{ color: 'var(--text-primary)' }}>
                           {nodeDatum.attributes?.partnerName}
                         </h4>
-                        <p className="text-[8px] font-black uppercase tracking-[0.1em] opacity-70" style={{ color: '#f43f5e' }}>
+                        <p className="text-[9px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: '#f43f5e' }}>
                           {nodeDatum.attributes?.partnerRole}
                         </p>
                       </div>
@@ -356,23 +378,40 @@ export default function FamilyTree() {
               </div>
             </div>
 
-            {/* Zoom controls */}
-            <div className="absolute bottom-4 right-4 z-30 flex flex-col gap-1.5 backdrop-blur-xl p-1 rounded-2xl border shadow-xl"
-              style={{ backgroundColor: 'rgba(var(--bg-secondary-rgb, 255,255,255), 0.7)', borderColor: 'var(--border-color)' }}>
-              <button className="p-2 rounded-xl hover:scale-110 transition-transform" style={{ color: 'var(--text-secondary)' }}><ZoomIn size={16} /></button>
-              <button className="p-2 rounded-xl hover:scale-110 transition-transform" style={{ color: 'var(--text-secondary)' }}><ZoomOut size={16} /></button>
-              <button className="p-2 rounded-xl hover:scale-110 transition-transform" style={{ color: 'var(--text-secondary)' }}><Maximize size={16} /></button>
+            {/* Usage Hint & Controls */}
+            <div className="absolute bottom-6 right-6 z-30 flex flex-col gap-3">
+              <button 
+                onClick={() => setTreeKey(k => k + 1)}
+                className="self-end backdrop-blur-xl px-4 py-2 rounded-2xl border shadow-xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+                style={{ backgroundColor: 'rgba(var(--bg-secondary-rgb, 255,255,255), 0.7)', borderColor: 'var(--border-color)' }}
+              >
+                <div className="w-5 h-5 rounded-full flex items-center justify-center transition-colors group-hover:bg-emerald-500/10">
+                  <Maximize size={12} style={{ color: 'var(--text-primary)' }} />
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>Center Tree</span>
+              </button>
+              
+              <div className="backdrop-blur-xl px-4 py-2 rounded-2xl border shadow-xl flex items-center gap-2 pointer-events-none"
+                style={{ backgroundColor: 'rgba(var(--bg-secondary-rgb, 255,255,255), 0.7)', borderColor: 'var(--border-color)' }}>
+                <ZoomIn size={14} style={{ color: 'var(--text-secondary)' }} />
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Scroll to Zoom · Drag to Pan</span>
+              </div>
             </div>
 
-            <div className="w-full h-full bg-[radial-gradient(circle_at_center,var(--bg-secondary),transparent_80%)]">
+            {/* Dynamic Background */}
+            <div className="w-full h-full relative" style={{ backgroundColor: 'var(--bg-primary)' }}>
+              {/* Subtle animated gradient overlay */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.05),transparent_70%)] pointer-events-none" />
+              
               <Tree
+                key={treeKey}
                 data={treeData}
                 orientation="vertical"
-                pathFunc="step"
-                separation={{ siblings: 1.8, nonSiblings: 2.2 }}
+                pathFunc="diagonal"
+                separation={{ siblings: 1.2, nonSiblings: 1.5 }}
                 translate={{ x: (window.innerWidth - 240) / 2, y: 120 }}
                 renderCustomNodeElement={renderCustomNode}
-                nodeSize={{ x: 480, y: 450 }}
+                nodeSize={{ x: 420, y: 320 }}
                 scaleExtent={{ min: 0.1, max: 2 }}
                 transitionDuration={500}
                 initialDepth={10}
